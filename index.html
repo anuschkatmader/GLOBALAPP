@@ -9,6 +9,8 @@
 function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTrustInPhone(); } }
 </script>
 <!-- OneTrust Cookies Consent Notice end for anuschkatmader.github.io/GLOBALAPP -->
+<!-- OneTrust Embedded Webform — Pet insurance consent collection (place at top of <head>) -->
+<script src="https://privacyportaltrial.onetrust.com/consent-embedded-forms/consent-receipt-scripts/OtFormStub.js" data-id="89af9315-196c-45ad-88ea-1b8ec3fe5a51" worker="https://consent-api.onetrust.com"></script>
 <!-- Allianz-branded OneTrust theme (host this file alongside index.html) -->
 <link rel="stylesheet" href="onetrust-allianz.css" />
 <title>Allianz — Mobile App Mockup</title>
@@ -319,6 +321,8 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
  .ad-body{padding:18px 20px 18px}
  .ad-body p{margin:0 0 14px;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
  .ot-slot-live{background:var(--fill);border-radius:14px;padding:14px}
+ #ot-container{margin-top:12px}
+ #ot-container:empty{margin-top:0}
  .wf-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2);margin-bottom:6px}
  .wf-input{width:100%;border:1px solid var(--sep);border-radius:10px;padding:12px;font-size:15px;font-family:var(--font);background:var(--surface);color:var(--ink);outline:none}
  .wf-input:focus{border-color:var(--brand-2)}
@@ -673,12 +677,12 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
 </div>
 <div class="ad-body">
 <p>Vet bills add up fast. Cover accidents, illness and routine care for your dog or cat from €9/month. Be first to know when it launches in your region.</p>
-<!-- ONETRUST WEBFORM: replace the contents of #onetrust-webform-slot with your embedded OneTrust webform (script or iframe). It collects the email + marketing consent. -->
+<!-- ONETRUST EMBEDDED WEBFORM (Pet insurance consent).
+              Layout = INLINE → the form renders into #ot-container.
+              The trigger button (class ot-open-webform) opens it on demand; the id is the form id with the "ot-" prefix removed, per OneTrust. -->
 <div id="onetrust-webform-slot" class="ot-slot-live">
-<label class="wf-label" for="ad-email">Email</label>
-<input id="ad-email" class="wf-input" type="email" value="anuschka.mader@example.com">
-<label class="wf-consent"><input type="checkbox"> I'd like to hear about Allianz Pet insurance and agree to the Privacy Notice.</label>
-<button class="wf-btn" onclick="closeAd()">Keep me posted</button>
+<button class="ot-open-webform wf-btn" id="4574b7d1-a890-4b3b-bd28-b9fe76673ad8">Keep me posted</button>
+<div id="ot-container"></div>
 </div>
 <button class="ad-later" onclick="closeAd()">Maybe later</button>
 </div>
