@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<!-- OneTrust Cookies Consent Notice start for anuschkatmader.github.io/GLOBALAPP -->
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" type="text/javascript" charset="UTF-8" data-domain-script="019ed013-74de-732e-ba27-c63e1c69bf86"></script>
+<script type="text/javascript">
+function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTrustInPhone(); } }
+</script>
+<!-- OneTrust Cookies Consent Notice end for anuschkatmader.github.io/GLOBALAPP -->
+<!-- Allianz-branded OneTrust theme (host this file alongside index.html) -->
+<link rel="stylesheet" href="onetrust-allianz.css" />
 <title>Allianz — Mobile App Mockup</title>
 <style>
  /* ============ TOKENS ============ */
@@ -332,26 +340,20 @@
  .seg button.on{background:#fff;color:#06203f}
  .hint{color:rgba(255,255,255,.55);font-size:12px;text-align:center;max-width:392px;line-height:1.5}
  .hint b{color:rgba(255,255,255,.8)}
- /* ===== DEMO cookie banner (preview of OneTrust styling) ===== */
- .cookie{
-   position:absolute;left:12px;right:12px;bottom:14px;z-index:200;
-   background:var(--surface);color:var(--ink);
-   border:1px solid var(--sep);border-radius:20px;
-   box-shadow:0 10px 40px rgba(0,0,0,.28);
-   padding:18px 18px 16px;
-   transform:translateY(160%);transition:transform .5s cubic-bezier(.32,.72,0,1);
+ /* ===== Contain the real OneTrust banner + preference center inside the phone ===== */
+ #onetrust-consent-sdk #onetrust-banner-sdk{
+   position:absolute !important; left:12px !important; right:12px !important; bottom:14px !important;
+   top:auto !important; width:auto !important; max-width:none !important;
+   border-radius:20px !important; box-shadow:0 10px 40px rgba(0,0,0,.28) !important;
  }
- .cookie.show{transform:none}
- .cookie h4{margin:0 0 6px;font-size:16px;font-weight:800;letter-spacing:-.2px;color:var(--ink)}
- .cookie p{margin:0 0 14px;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
- .cookie p a{color:var(--brand-2);font-weight:600;text-decoration:underline}
- .cookie .ot-row{display:flex;gap:8px;margin-bottom:8px}
- .cookie button{flex:1;border-radius:11px;padding:12px;font-size:13.5px;font-weight:700;font-family:var(--font);cursor:pointer;border:1.5px solid transparent}
- .cookie .accept{background:var(--brand);color:#fff}
- [data-theme="dark"] .cookie .accept{background:#0a63b4}
- .cookie .reject{background:transparent;color:var(--brand);border-color:var(--sep)}
- [data-theme="dark"] .cookie .reject{color:#5cc0f5}
- .cookie .settings{width:100%;background:transparent;color:var(--ink-2);border:none;text-decoration:underline;font-weight:600;padding:4px}
+ #onetrust-consent-sdk .onetrust-pc-dark-filter{
+   position:absolute !important; inset:0 !important; border-radius:44px !important;
+ }
+ #onetrust-consent-sdk #onetrust-pc-sdk{
+   position:absolute !important; left:0 !important; right:0 !important; bottom:0 !important; top:34px !important;
+   width:100% !important; min-width:0 !important; max-width:100% !important; height:auto !important;
+   margin:0 !important; border-radius:22px 22px 44px 44px !important;
+ }
  @media (max-width:430px){
    body{padding:10px 4px}
    .phone{--w:min(92vw,392px);--h:min(190vw,844px)}
@@ -631,16 +633,7 @@
 </nav>
 </section>
 </div>
-<!-- ===== DEMO COOKIE BANNER — preview only. Remove this whole block when you add the real OneTrust script. ===== -->
-<div class="cookie" id="cookie" role="dialog" aria-label="Cookie consent">
-<h4>We value your privacy</h4>
-<p>We use cookies to keep the app secure, remember your preferences, and understand how it's used. See our <a href="#">Cookie Policy</a>.</p>
-<div class="ot-row">
-<button class="reject" onclick="closeCookie()">Reject all</button>
-<button class="accept" onclick="closeCookie()">Accept all</button>
-</div>
-<button class="settings" onclick="closeCookie()">Cookie settings</button>
-</div>
+<!-- The real OneTrust banner is injected by the SDK and relocated into this phone frame at runtime. -->
 <!-- ===== CROSS-SELL POPUP AD (opens when Policies is viewed) ===== -->
 <div class="ad-back" id="adBack" onclick="closeAd()"></div>
 <div class="ad" id="ad" role="dialog" aria-label="New product offer">
@@ -717,9 +710,17 @@
    document.documentElement.setAttribute('data-theme', mode);
    document.querySelectorAll('#theme-seg button').forEach(b=>b.classList.toggle('on', b.dataset.themeBtn===mode));
  }
- // DEMO cookie banner (remove with the HTML block when wiring real OneTrust)
- function closeCookie(){ document.getElementById('cookie').classList.remove('show'); }
- window.addEventListener('load', ()=>{ setTimeout(()=>document.getElementById('cookie').classList.add('show'), 600); });
+ // Relocate the OneTrust consent UI into the phone frame so it renders on-screen (mockup only).
+ window.placeOneTrustInPhone = function(){
+   var sdk = document.getElementById('onetrust-consent-sdk');
+   var scr = document.getElementById('screen');
+   if (sdk && scr && sdk.parentNode !== scr) scr.appendChild(sdk);
+ };
+ (function(){
+   if (!('MutationObserver' in window)) return;
+   var obs = new MutationObserver(function(){ window.placeOneTrustInPhone(); });
+   obs.observe(document.documentElement, { childList:true, subtree:true });
+ })();
 </script>
 </body>
 </html>
