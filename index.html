@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 <!-- OneTrust Cookies Consent Notice start for anuschkatmader.github.io/GLOBALAPP -->
-<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js " type="text/javascript" charset="UTF-8" data-domain-script="019ed013-74de-732e-ba27-c63e1c69bf86"></script>
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" type="text/javascript" charset="UTF-8" data-domain-script="019ed013-74de-732e-ba27-c63e1c69bf86"></script>
 <script type="text/javascript">
 function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTrustInPhone(); } }
 </script>
@@ -15,7 +15,7 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
 <script>
   window.OtSdk = window.OtSdk || function () { (OtSdk.q = OtSdk.q || []).push(arguments); };
 </script>
-<script src="https://privacyportaltrial.onetrust.com/consent-embedded-forms/consent-receipt-scripts/OtFormStub.js " data-id="89af9315-196c-45ad-88ea-1b8ec3fe5a51" worker="https://consent-api.onetrust.com "></script>
+<script src="https://privacyportaltrial.onetrust.com/consent-embedded-forms/consent-receipt-scripts/OtFormStub.js" data-id="89af9315-196c-45ad-88ea-1b8ec3fe5a51" worker="https://consent-api.onetrust.com"></script>
 
 <!-- Allianz-branded OneTrust theme (host this file alongside index.html) -->
 <link rel="stylesheet" href="onetrust-allianz.css" />
@@ -813,6 +813,7 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
   function openAd(){
     document.getElementById('adBack').classList.add('show');
     document.getElementById('ad').classList.add('show');
+    setTimeout(installPetForm, 500); // install once the ad has finished opening and the container is visible
   }
   function closeAd(){ document.getElementById('adBack').classList.remove('show'); document.getElementById('ad').classList.remove('show'); }
   function setTheme(mode){
@@ -836,28 +837,27 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
   window.addEventListener('OnetrustFormLoaded', function(e){ console.log('OnetrustFormLoaded', e.detail); });
 
   // OneTrust embedded web form — render the Pet insurance consent form into #ot-container.
-  // (Same approach as the working reference: poll for the SDK, then InstallCP the collection point.)
-  (function () {
-    var CP_ID = "4574b7d1-a890-4b3b-bd28-b9fe76673ad8"; // collection point id (the "ot-" prefix removed)
-    function whenOTReady(callback) {
-      var timer = setInterval(function () {
-        if (window.OneTrust && window.OneTrust.webform && window.OneTrust.webform.InstallCP) {
-          clearInterval(timer);
-          callback();
-        }
-      }, 80);
-    }
-    function install() {
-      whenOTReady(function () {
-        OneTrust.webform.InstallCP(CP_ID, { target: "#ot-container" });
-      });
-    }
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", install);
-    } else {
-      install();
-    }
-  })();
+  // Installed when the ad first OPENS, so the container is fully visible/laid out
+  // (the SDK won't render into a hidden/opacity:0 container).
+  var petFormInstalled = false;
+  function installPetForm(){
+    if (petFormInstalled) return;
+    var tries = 0;
+    var timer = setInterval(function(){
+      tries++;
+      if (window.OneTrust && window.OneTrust.webform && window.OneTrust.webform.InstallCP) {
+        clearInterval(timer);
+        if (petFormInstalled) return;
+        petFormInstalled = true;
+        try {
+          OneTrust.webform.InstallCP("4574b7d1-a890-4b3b-bd28-b9fe76673ad8", { target: "#ot-container" });
+        } catch (e) { petFormInstalled = false; console.warn('OneTrust InstallCP failed:', e); }
+      } else if (tries > 75) { // ~6s
+        clearInterval(timer);
+        console.warn('OneTrust web form SDK never became ready — confirm the collection point is published and this domain is authorized.');
+      }
+    }, 80);
+  }
 </script>
 </body>
 </html>
