@@ -359,6 +359,31 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
   .ot-slot-live{background:var(--fill);border-radius:14px;padding:14px}
   #ot-container{margin-top:12px}
   #ot-container:empty{margin-top:0}
+
+  /* ===== Allianz branding for the OneTrust embedded web form (renders into #ot-container) =====
+     Applies only if the form renders as inline DOM (not an <iframe>/shadow DOM). These are element-level
+     selectors so they land even before you know OneTrust's class names — refine once you inspect the form. */
+  #ot-container, #ot-container *{font-family:var(--font) !important}
+  #ot-container label{font-size:13px !important;color:var(--ink-2) !important;line-height:1.4 !important}
+  #ot-container input[type="text"],
+  #ot-container input[type="email"],
+  #ot-container input[type="tel"],
+  #ot-container select,
+  #ot-container textarea{
+    width:100% !important;box-sizing:border-box !important;
+    border:1px solid var(--sep) !important;border-radius:10px !important;
+    padding:12px !important;font-size:15px !important;
+    background:var(--surface) !important;color:var(--ink) !important;outline:none !important;
+  }
+  #ot-container input:focus,#ot-container select:focus,#ot-container textarea:focus{border-color:var(--brand-2) !important}
+  #ot-container input[type="checkbox"],#ot-container input[type="radio"]{accent-color:var(--brand) !important}
+  #ot-container button,#ot-container input[type="submit"],#ot-container [type="submit"]{
+    width:100% !important;background:var(--brand) !important;color:#fff !important;border:none !important;
+    border-radius:11px !important;padding:13px 16px !important;font-size:15px !important;font-weight:700 !important;
+    cursor:pointer !important;font-family:var(--font) !important;
+  }
+  [data-theme="dark"] #ot-container button,[data-theme="dark"] #ot-container [type="submit"]{background:#0a63b4 !important}
+  #ot-container a{color:var(--brand-2) !important;font-weight:600 !important}
   .wf-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2);margin-bottom:6px}
   .wf-input{width:100%;border:1px solid var(--sep);border-radius:10px;padding:12px;font-size:15px;font-family:var(--font);background:var(--surface);color:var(--ink);outline:none}
   .wf-input:focus{border-color:var(--brand-2)}
