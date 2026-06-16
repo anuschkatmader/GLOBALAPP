@@ -340,15 +340,39 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
  .seg button.on{background:#fff;color:#06203f}
  .hint{color:rgba(255,255,255,.55);font-size:12px;text-align:center;max-width:392px;line-height:1.5}
  .hint b{color:rgba(255,255,255,.8)}
- /* ===== Contain the real OneTrust banner + preference center inside the phone ===== */
+ /* ===== Contain + re-lay-out the real OneTrust banner/PC inside the phone =====
+    OneTrust keys its mobile layout off the browser window (wide desktop here),
+    so we force a clean vertical stack, scoped to the in-phone instance. */
  #onetrust-consent-sdk #onetrust-banner-sdk{
    position:absolute !important; left:12px !important; right:12px !important; bottom:14px !important;
    top:auto !important; width:auto !important; max-width:none !important;
-   border-radius:20px !important; box-shadow:0 10px 40px rgba(0,0,0,.28) !important;
+   border-radius:22px !important; padding:20px 18px !important;
+   max-height:76% !important; overflow:auto !important;
+   box-shadow:0 14px 44px rgba(0,0,0,.32) !important;
  }
- #onetrust-consent-sdk .onetrust-pc-dark-filter{
-   position:absolute !important; inset:0 !important; border-radius:44px !important;
+ #onetrust-consent-sdk #onetrust-banner-sdk::-webkit-scrollbar{display:none !important;}
+ /* drop OneTrust's column grid */
+ #onetrust-consent-sdk #onetrust-banner-sdk .ot-sdk-container{width:100% !important;max-width:100% !important;padding:0 !important;margin:0 !important;}
+ #onetrust-consent-sdk #onetrust-banner-sdk .ot-sdk-row{display:block !important;}
+ #onetrust-consent-sdk #onetrust-group-container,
+ #onetrust-consent-sdk #onetrust-button-group-parent{
+   width:100% !important;max-width:100% !important;float:none !important;
+   margin:0 !important;padding:0 !important;position:static !important;transform:none !important;
  }
+ #onetrust-consent-sdk #onetrust-policy{margin:0 0 16px !important;padding:0 !important;}
+ #onetrust-consent-sdk #onetrust-policy-title{margin:0 0 6px !important;}
+ #onetrust-consent-sdk #onetrust-policy-text{margin:0 !important;}
+ /* stack the buttons full-width: Accept, Reject, then Cookie Settings */
+ #onetrust-consent-sdk #onetrust-button-group{display:flex !important;flex-direction:column !important;gap:10px !important;margin:0 !important;width:100% !important;}
+ #onetrust-consent-sdk .banner-actions-container{display:flex !important;flex-direction:column !important;gap:10px !important;width:100% !important;order:1 !important;margin:0 !important;}
+ #onetrust-consent-sdk #onetrust-accept-btn-handler{order:1 !important;}
+ #onetrust-consent-sdk #onetrust-reject-all-handler{order:2 !important;}
+ #onetrust-consent-sdk #onetrust-banner-sdk button{width:100% !important;margin:0 !important;}
+ #onetrust-consent-sdk #onetrust-pc-btn-handler{order:3 !important;width:100% !important;margin:4px 0 0 !important;padding:6px !important;}
+ /* hide the floating close X — Reject All already covers it, and it's cleaner */
+ #onetrust-consent-sdk #onetrust-close-btn-container{display:none !important;}
+ /* preference center as a bottom sheet inside the phone */
+ #onetrust-consent-sdk .onetrust-pc-dark-filter{position:absolute !important; inset:0 !important; border-radius:44px !important;}
  #onetrust-consent-sdk #onetrust-pc-sdk{
    position:absolute !important; left:0 !important; right:0 !important; bottom:0 !important; top:34px !important;
    width:100% !important; min-width:0 !important; max-width:100% !important; height:auto !important;
