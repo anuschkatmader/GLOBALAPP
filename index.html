@@ -382,22 +382,25 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
     background:transparent !important;color:var(--ink) !important;outline:none !important;
   }
   #ot-container input:focus{border-bottom-color:var(--brand-2) !important}
-  #ot-container input[type="checkbox"]{
+  /* Higher specificity (two IDs) to beat OneTrust's own checkbox CSS, plus a custom-drawn blue/white box. */
+  #onetrust-webform-slot #ot-container input[type="checkbox"]{
     -webkit-appearance:none !important;appearance:none !important;
     width:20px !important;height:20px !important;min-width:20px !important;
     border:1.5px solid var(--brand) !important;border-radius:5px !important;
-    background:#fff !important;position:relative !important;cursor:pointer !important;
+    background:#fff !important;background-image:none !important;position:relative !important;cursor:pointer !important;
     flex:0 0 auto !important;margin:1px 0 0 0 !important;padding:0 !important;box-shadow:none !important;
   }
-  #ot-container input[type="checkbox"]:checked{background:var(--brand) !important;border-color:var(--brand) !important}
-  #ot-container input[type="checkbox"]:checked::after{
-    content:"" !important;position:absolute !important;left:6px !important;top:2px !important;
+  #onetrust-webform-slot #ot-container input[type="checkbox"]:checked{background:var(--brand) !important;border-color:var(--brand) !important}
+  #onetrust-webform-slot #ot-container input[type="checkbox"]:checked::after{
+    content:"" !important;position:absolute !important;left:6px !important;top:2px !important;right:auto !important;bottom:auto !important;
     width:5px !important;height:10px !important;border:solid #fff !important;border-width:0 2px 2px 0 !important;
-    transform:rotate(45deg) !important;
+    background:none !important;transform:rotate(45deg) !important;
   }
-  [data-theme="dark"] #ot-container input[type="checkbox"]{border-color:#5cc0f5 !important}
-  [data-theme="dark"] #ot-container input[type="checkbox"]:checked{background:#0a63b4 !important;border-color:#0a63b4 !important}
-  #ot-container input[type="radio"]{accent-color:var(--brand) !important}
+  /* Suppress any checkmark OneTrust draws via the input's own ::before */
+  #onetrust-webform-slot #ot-container input[type="checkbox"]::before{content:none !important;display:none !important}
+  [data-theme="dark"] #onetrust-webform-slot #ot-container input[type="checkbox"]{border-color:#5cc0f5 !important}
+  [data-theme="dark"] #onetrust-webform-slot #ot-container input[type="checkbox"]:checked{background:#0a63b4 !important;border-color:#0a63b4 !important}
+  #onetrust-webform-slot #ot-container input[type="radio"]{accent-color:var(--brand) !important}
   #ot-container button,#ot-container input[type="submit"],#ot-container [type="submit"]{
     width:100% !important;background:var(--brand) !important;color:#fff !important;border:none !important;
     border-radius:11px !important;padding:13px 16px !important;font-size:15px !important;font-weight:700 !important;
@@ -860,13 +863,14 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
     startPetFormInstall(); // auto-render the OneTrust web form into the open ad
   }
   function closeAd(){ document.getElementById('adBack').classList.remove('show'); document.getElementById('ad').classList.remove('show'); }
-  // When the OneTrust web form is submitted, close the whole Pet ad popup.
-  // Delegated on #ot-container (present from load) so it catches the form's submit button once rendered.
+  // Official OneTrust event — fires when the embedded web form is successfully submitted.
+  window.addEventListener('OneTrustWebFormSubmitted', function(){ setTimeout(closeAd, 400); });
+  // Fallback: also close when the form's submit button is clicked (in case the event name varies by version).
   (function(){
     var c = document.getElementById('ot-container');
     if (c) c.addEventListener('click', function(e){
       if (e.target.closest('button, input[type="submit"], input[type="button"], [type="submit"]')){
-        setTimeout(closeAd, 600); // let OneTrust register the submission first
+        setTimeout(closeAd, 700);
       }
     });
   })();
