@@ -331,7 +331,8 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
 
   /* consent matrix */
   .consent-prod{display:flex;align-items:center;gap:12px;padding:14px 16px;font-weight:800;font-size:15px;color:var(--ink);border-bottom:1px solid var(--sep)}
-  .consent-prod .tile{width:34px;height:34px;border-radius:10px}
+  .consent-prod .tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto}
+  .consent-prod .tile svg{width:18px;height:18px;display:block}
   .crow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;position:relative}
   .crow + .crow::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:var(--sep)}
   .crow .pt{font-size:14.5px;font-weight:600;color:var(--ink)}
@@ -381,7 +382,22 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
     background:transparent !important;color:var(--ink) !important;outline:none !important;
   }
   #ot-container input:focus{border-bottom-color:var(--brand-2) !important}
-  #ot-container input[type="checkbox"],#ot-container input[type="radio"]{accent-color:var(--brand) !important}
+  #ot-container input[type="checkbox"]{
+    -webkit-appearance:none !important;appearance:none !important;
+    width:20px !important;height:20px !important;min-width:20px !important;
+    border:1.5px solid var(--brand) !important;border-radius:5px !important;
+    background:#fff !important;position:relative !important;cursor:pointer !important;
+    flex:0 0 auto !important;margin:1px 0 0 0 !important;padding:0 !important;box-shadow:none !important;
+  }
+  #ot-container input[type="checkbox"]:checked{background:var(--brand) !important;border-color:var(--brand) !important}
+  #ot-container input[type="checkbox"]:checked::after{
+    content:"" !important;position:absolute !important;left:6px !important;top:2px !important;
+    width:5px !important;height:10px !important;border:solid #fff !important;border-width:0 2px 2px 0 !important;
+    transform:rotate(45deg) !important;
+  }
+  [data-theme="dark"] #ot-container input[type="checkbox"]{border-color:#5cc0f5 !important}
+  [data-theme="dark"] #ot-container input[type="checkbox"]:checked{background:#0a63b4 !important;border-color:#0a63b4 !important}
+  #ot-container input[type="radio"]{accent-color:var(--brand) !important}
   #ot-container button,#ot-container input[type="submit"],#ot-container [type="submit"]{
     width:100% !important;background:var(--brand) !important;color:#fff !important;border:none !important;
     border-radius:11px !important;padding:13px 16px !important;font-size:15px !important;font-weight:700 !important;
@@ -844,6 +860,16 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
     startPetFormInstall(); // auto-render the OneTrust web form into the open ad
   }
   function closeAd(){ document.getElementById('adBack').classList.remove('show'); document.getElementById('ad').classList.remove('show'); }
+  // When the OneTrust web form is submitted, close the whole Pet ad popup.
+  // Delegated on #ot-container (present from load) so it catches the form's submit button once rendered.
+  (function(){
+    var c = document.getElementById('ot-container');
+    if (c) c.addEventListener('click', function(e){
+      if (e.target.closest('button, input[type="submit"], input[type="button"], [type="submit"]')){
+        setTimeout(closeAd, 600); // let OneTrust register the submission first
+      }
+    });
+  })();
   function setTheme(mode){
     document.documentElement.setAttribute('data-theme', mode);
     document.querySelectorAll('#theme-seg button').forEach(b=>b.classList.toggle('on', b.dataset.themeBtn===mode));
