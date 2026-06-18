@@ -841,7 +841,7 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
   function openAd(){
     document.getElementById('adBack').classList.add('show');
     document.getElementById('ad').classList.add('show');
-    setTimeout(installPetForm, 500); // install once the ad has finished opening and the container is visible
+    startPetFormInstall(); // auto-render the OneTrust web form into the open ad
   }
   function closeAd(){ document.getElementById('adBack').classList.remove('show'); document.getElementById('ad').classList.remove('show'); }
   function setTheme(mode){
@@ -865,26 +865,32 @@ function OptanonWrapper() { if (window.placeOneTrustInPhone) { window.placeOneTr
   window.addEventListener('OnetrustFormLoaded', function(e){ console.log('OnetrustFormLoaded', e.detail); });
 
   // OneTrust embedded web form — render the Pet insurance consent form into #ot-container.
-  // Installed when the ad first OPENS, so the container is fully visible/laid out
-  // (the SDK won't render into a hidden/opacity:0 container).
-  var petFormInstalled = false;
-  function installPetForm(){
-    if (petFormInstalled) return;
-    var tries = 0;
-    var timer = setInterval(function(){
-      tries++;
-      if (window.OneTrust && window.OneTrust.webform && window.OneTrust.webform.InstallCP) {
-        clearInterval(timer);
-        if (petFormInstalled) return;
-        petFormInstalled = true;
-        try {
-          OneTrust.webform.InstallCP("4574b7d1-a890-4b3b-bd28-b9fe76673ad8", { target: "#ot-container" });
-        } catch (e) { petFormInstalled = false; console.warn('OneTrust InstallCP failed:', e); }
-      } else if (tries > 75) { // ~6s
-        clearInterval(timer);
-        console.warn('OneTrust web form SDK never became ready — confirm the collection point is published and this domain is authorized.');
+  // Installs automatically whenever the ad opens, retrying until the form is actually in the DOM
+  // (the SDK skips hidden containers, and load timing varies). Stops once rendered, so no duplicates.
+  var PET_CP_ID = "4574b7d1-a890-4b3b-bd28-b9fe76673ad8";
+  var petPoller = null, petLastCall = 0;
+  function otWebformReady(){ return window.OneTrust && window.OneTrust.webform && window.OneTrust.webform.InstallCP; }
+  function petFormRendered(){ var c = document.getElementById('ot-container'); return !!(c && c.children.length); }
+  function adIsOpen(){ var a = document.getElementById('ad'); return !!(a && a.classList.contains('show')); }
+  function startPetFormInstall(){
+    if (petPoller || petFormRendered()) return;
+    var attempts = 0;
+    petPoller = setInterval(function(){
+      attempts++;
+      if (petFormRendered()){ clearInterval(petPoller); petPoller = null; return; }
+      if (adIsOpen() && otWebformReady()){
+        var now = Date.now();
+        if (now - petLastCall >= 1500){ // debounce so a pending async render isn't duplicated
+          petLastCall = now;
+          try { OneTrust.webform.InstallCP(PET_CP_ID, { target: "#ot-container" }); }
+          catch (e){ console.warn('OneTrust InstallCP failed:', e); }
+        }
       }
-    }, 80);
+      if (attempts > 60){ // ~18s safety stop
+        clearInterval(petPoller); petPoller = null;
+        if (!petFormRendered()) console.warn('OneTrust web form did not render — confirm the collection point is published and this domain is authorized.');
+      }
+    }, 300);
   }
 </script>
 </body>
